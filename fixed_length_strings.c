@@ -8,6 +8,15 @@ typedef struct{
     int len;
 }Str;
 
+int Creat_Strings(Str* s,int len){
+	int i;
+	s->len=len;
+	for(i=0;i<len;i++)
+	{
+		s->ch[i]=getchar();
+		getchar();
+	}
+}
 /*insert strings*/
 int Str_Insert(Str* s,int pos,const Str p){
     int i;
@@ -43,22 +52,14 @@ int Str_Insert(Str* s,int pos,const Str p){
 int main(int argc, char const *argv[])
 {
     int i;
-    Str a;
-    Str b;
-    for(i=0;i<4;i++)
-        scanf("%c",&b.ch[i]);
-    b.len = 4;
-
-    for(i=0;i<4;i++)
-        scanf("%c",&a.ch[i]);
-    a.len=4;
-
+ 	Str a,b;
+ 	Creat_Strings(&a,4);
+ 	Creat_Strings(&b,4);
+ 	
     Str_Insert(&a,3,b);
-
+	
+	printf("%d\n",a.len); 
     for(i=0;i<a.len;i++)
-        printf("%c",a.ch[i]);
-
-
-
+    printf("%c",a.ch[i]);
     return 0;
 }
