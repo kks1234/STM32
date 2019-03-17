@@ -207,7 +207,7 @@ void rtc_updata_time()
 		
 		while(temp >= 28)
 		{
-			if( rtc_judge_year(temp1) && temp1 == 1) 
+			if( rtc_judge_year(time_struct.year) && temp1 == 1) 
 			{
 				if(temp >= 29) temp -= 29;
 				else break;
