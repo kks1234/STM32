@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<package schemaVersion="1.4" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="PACK.xsd">
+  <vendor>rt-thread</vendor>
+  <name>rtthread</name>
+  <description>RT-Thread Software Components</description>
+  <url>http://www.rt-thread.org/download/mdk/</url>
+  <supportContact>http://www.rt-thread.org</supportContact>
+
+  <license>License.txt</license>
+  
+  <releases>
+    <release version="3.0.3" date="2018-03-09">
+      Updated to RT-Thread 3.0.3
+      Added V2M-MPS2 example
+    </release>
+    <release version="2.1.1">
+      first release
+    </release>
+  </releases>
+
+  <keywords>
+    <!-- keywords for indexing -->
+    <keyword>rt-thread</keyword>
+	<keyword>rtthread</keyword>
+	<keyword>rtt</keyword>
+  </keywords>
+  
+  <!-- apis section (optional - for Application Programming Interface descriptions) -->
+  <!-- 
+  <apis>
+  </apis>
+  -->
+
+  <!-- boards section (mandatory for Board Support Packs) -->
+  <!-- 
+  <boards>
+  </boards>
+  -->
+
+  <!-- devices section (mandatory for Device Family Packs) -->
+  <!--
+  <devices>
+  </devices>
+  -->
+  
+  <conditions> 
+    <condition id="ARM Compiler">
+      <require Tcompiler="ARMCC"/>
+    </condition>
+    <condition id="Cortex-M">
+      <accept  Dcore="Cortex-M0"/>
+      <accept  Dcore="Cortex-M0+"/>
+	  <accept  Dcore="Cortex-M3"/>
+	  <accept  Dcore="Cortex-M4"/>
+	  <accept  Dcore="Cortex-M7"/>
+    </condition>
+    <condition id="CM0">
+      <description>Cortex-M0 based device</description>
+      <require condition="ARM Compiler"/>
+      <accept  Dcore="Cortex-M0"/>
+      <accept  Dcore="Cortex-M0+"/>
+    </condition>
+    <condition id="CM3">
+      <description>Cortex-M3 based device</description>
+      <require condition="ARM Compiler"/>
+      <accept  Dcore="Cortex-M3"/>
+    </condition>
+    <condition id="CM4">
+      <description>Cortex-M4 based device</description>
+      <require condition="ARM Compiler"/>
+      <accept  Dcore="Cortex-M4"/>
+    </condition>
+	<condition id="CM7">
+      <description>Cortex-M7 based device</description>
+      <require condition="ARM Compiler"/>
+      <accept  Dcore="Cortex-M7"/>
+    </condition>
+    <condition id="CMSIS Core with RTOS">
+      <description>CMSIS Core with RTOS for Cortex-M processor</description>
+      <accept  condition="Cortex-M"/>
+    </condition>
+    <condition id="device">
+      <description>device for rt-thread</description>
+      <require Cclass="RTOS" Cgroup="kernel"/>
+    </condition>
+    <condition id="shell">
+      <description>msh shell</description>
+      <require Cclass="RTOS" Cgroup="device drivers"/>
+    </condition>
+  </conditions>
+  
+  <components>
+	<bundle Cbundle="RT-Thread" Cclass="RTOS" Cversion="3.0.3">
+	<description>rt-thread</description>
+	<doc></doc>
+	<component Cgroup="kernel" condition="CMSIS Core with RTOS">
+		<description>rt-thread kernel files</description>
+		<files>
+			<file category="include" name="include/"/>
+			<file category="header" name="bsp/rtconfig.h" attr="config" version="3.0.3"/>
+			<file category="source" name="bsp/board.c" attr="config" version="3.0.3"/>
+
+			<file category="source" name="src/clock.c"/>
+			<file category="source" name="src/components.c"/>
+			<file category="source" name="src/device.c"/>
+			<file category="source" name="src/idle.c"/>
+			<file category="source" name="src/ipc.c"/>
+			<file category="source" name="src/irq.c"/>
+			<file category="source" name="src/kservice.c"/>
+			<file category="source" name="src/mem.c"/>
+			<file category="source" name="src/object.c"/>
+			<file category="source" name="src/scheduler.c"/>
+			<file category="source" name="src/thread.c"/>
+			<file category="source" name="src/timer.c"/>
+			
+			<file category="source" name="libcpu/arm/cortex-m0/cpuport.c" condition="CM0"/>
+			<file category="sourceAsm" name="libcpu/arm/cortex-m0/context_rvds.S" condition="CM0"/>
+
+			<file category="source" name="libcpu/arm/cortex-m3/cpuport.c" condition="CM3"/>
+			<file category="sourceAsm" name="libcpu/arm/cortex-m3/context_rvds.S" condition="CM3"/>
+
+			<file category="source" name="libcpu/arm/cortex-m4/cpuport.c" condition="CM4"/>
+			<file category="sourceAsm" name="libcpu/arm/cortex-m4/context_rvds.S" condition="CM4"/>
+
+			<file category="source" name="libcpu/arm/cortex-m7/cpuport.c" condition="CM7"/>
+			<file category="sourceAsm" name="libcpu/arm/cortex-m7/context_rvds.S" condition="CM7"/>	
+		</files>
+	</component>
+	
+	<component Cgroup="device drivers" condition="device">
+		<description>rt-thread device drivers files(abandoned component，reserved for compatibility)</description>
+		<RTE_Components_h>
+          #define RTE_USING_DEVICE
+        </RTE_Components_h>
+		<files>
+			<file category="include" name="include/"/>
+		</files>
+	</component>
+
+	<component Cgroup="shell" condition="shell">
+		<description>rt-thread msh</description>
+		<RTE_Components_h>
+          #define RTE_FINSH_USING_MSH
+        </RTE_Components_h>
+		<files>
+			<file category="include" name="components/finsh/"/>
+			
+			<file category="source" name="components/finsh/shell.c"/>
+			<file category="source" name="components/finsh/symbol.c"/>
+			<file category="source" name="components/finsh/cmd.c"/>
+			<file category="source" name="components/finsh/msh.c"/>
+			<file category="source" name="components/finsh/msh_cmd.c"/>
+			<file category="source" name="components/finsh/msh_file.c"/>
+		</files>
+	</component>
+	</bundle>
+  </components>
+  
+  <examples>
+    <!-- stm32l0 example -->
+	<example name="rt-thread blink example" doc="Abstract.txt" folder="bsp/stm32l0_blink">
+      <description>rt-thread blink example</description>
+      <board name="STM32L053-Discovery" vendor="STMicroelectronics"/>
+      <project>
+        <environment name="uv" load="project.uvprojx"/>
+      </project>
+      <attributes>
+        <component Cclass="rtthread" Cgroup="Kernel"/>
+        <category>Getting Started</category>
+        <category>rt-thread</category>
+      </attributes>
+    </example>
+	<example name="rt-thread msh example" doc="Abstract.txt" folder="bsp/stm32l0_msh">
+      <description>rt-thread msh example</description>
+      <board name="STM32L053-Discovery" vendor="STMicroelectronics"/>
+      <project>
+        <environment name="uv" load="project.uvprojx"/>
+      </project>
+      <attributes>
+        <component Cclass="rtthread" Cgroup="Kernel"/>
+        <category>Getting Started</category>
+        <category>rt-thread</category>
+      </attributes>
+    </example>
+
+    <!-- lpc824 example -->
+    <example name="rt-thread blink example" doc="Abstract.txt" folder="bsp/lpc824_blink">
+      <description>rt-thread blink example</description>
+      <board name="LPC824 LPCXpresso" vendor="NXP"/>
+      <project>
+        <environment name="uv" load="project.uvprojx"/>
+      </project>
+      <attributes>
+        <component Cclass="rtthread" Cgroup="Kernel"/>
+        <category>Getting Started</category>
+        <category>rt-thread</category>
+      </attributes>
+    </example>
+	
+	<example name="rt-thread msh example" doc="Abstract.txt" folder="bsp/lpc824_msh">
+      <description>rt-thread msh example</description>
+      <board name="LPC824 LPCXpresso" vendor="NXP"/>
+      <project>
+        <environment name="uv" load="project.uvprojx"/>
+      </project>
+      <attributes>
+        <component Cclass="rtthread" Cgroup="Kernel"/>
+        <category>Getting Started</category>
+        <category>rt-thread</category>
+      </attributes>
+    </example>
+	
+    <!--  V2M-MPS2 Board Examples -->
+    <example name="msh example for V2M-MPS2 board" doc="Abstract.txt" folder="bsp/v2m_mps2_msh">
+      <description>rt-thread msh example</description>
+      <board name="V2M-MPS2" vendor="ARM"/>
+      <project>
+        <environment name="uv" load="project.uvprojx"/>
+      </project>
+      <attributes>
+		<component Cclass="CMSIS" Cgroup="CORE"/>
+        <component Cclass="Device" Cgroup="Startup"/>
+        <component Cclass="rtthread" Cgroup="Kernel"/>
+        <category>Getting Started</category>
+        <category>rt-thread</category>
+      </attributes>
+    </example>
+  </examples>
+  
+  <!-- optional taxonomy section for defining new component Class and Group names -->
+  <!--
+  <taxonomy>
+  </taxonomy>
+  -->
+  
+</package>

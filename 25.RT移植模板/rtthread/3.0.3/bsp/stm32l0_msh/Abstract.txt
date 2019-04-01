@@ -1,0 +1,1 @@
+RT-Thread msh shell project for the STM32L0-Discovery.
