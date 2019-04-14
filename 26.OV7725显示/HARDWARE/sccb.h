@@ -8,18 +8,13 @@
 #define SDA_IN()    {GPIOG->CRH &= 0xFF0FFFFF;GPIOG->CRH |= 0x00800000;}
 
 
-#define SCCB_SDAIN    (PGin(13) !=0) 
-//(((GPIOG->IDR)&(1<<13)) != 0)
-#define SCCB_SDA_L    PGout(13)=0
-//GPIOG->BRR  = (1<<13)
-#define SCCB_SDA_H    PGout(13)=1
-//GPIOG->BSRR = (1<<13)
+#define SCCB_SDAIN    (((GPIOG->IDR)&(1<<13)) != 0)
+#define SCCB_SDA_L    GPIOG->BRR  = (1<<13)
+#define SCCB_SDA_H    GPIOG->BSRR = (1<<13)
 
 
-#define SCCB_SCL_L    PDout(3)=0
-//GPIOD->BRR  = (1<<3)
-#define SCCB_SCL_H    PDout(3)=1
-//GPIOD->BSRR = (1<<3)
+#define SCCB_SCL_L    GPIOD->BRR  = (1<<3)
+#define SCCB_SCL_H    GPIOD->BSRR = (1<<3)
 
 
 
