@@ -17,18 +17,16 @@ volatile uint8_t Ov7725_vsync ;	 /* 帧同步信号标志，在中断函数和main函数里面使用
  *****************************************************************************************/ 
 void SCCB_WriteByte(u16 WriteAddress, u8 Sendbyte)
 {
-	sccb_start();
-	sccb_write(OV_ID);  //器件地址
-	if(!wait_ack())
-	{
-		sccb_stop();
-		return ;
-	}
-	sccb_write((u8)(WriteAddress & 0x00FF)); //寄存器地址
-	wait_ack();
-	sccb_write(Sendbyte);
-	wait_ack();
-	sccb_stop();
+	sccb_start(); 					//启动SCCB传输
+	sccb_write(OV_ID);
+	wait_ack();	//写器件ID	  
+	delay_us(100);
+  	sccb_write(WriteAddress);
+	wait_ack();		//写寄存器地址	  
+	delay_us(100);
+  	sccb_write(Sendbyte);
+	wait_ack(); 	//写数据	 
+  	sccb_stop();	  
 }
 /******************************************************************************************************************
  * 函数名：SCCB_ReadByte
@@ -39,21 +37,24 @@ void SCCB_WriteByte(u16 WriteAddress, u8 Sendbyte)
 u8 SCCB_ReadByte(u8 ReadAddress)
 {
 	u8 val=0;
-	sccb_start(); 				//启动SCCB传输
-	sccb_write(OV_ID);		//写器件ID	  
+	sccb_start(); //wait_ack();				//启动SCCB传输
+	sccb_write(OV_ID);
+	wait_ack();	//写器件ID	  
 	delay_us(100);	 
-  	sccb_write(ReadAddress);			//写寄存器地址	  
+  	sccb_write(ReadAddress);
+	wait_ack();			//写寄存器地址	  
 	delay_us(100);	  
 	sccb_stop();   
 	delay_us(100);	   
 	//设置寄存器地址后，才是读
-	sccb_start();
-	sccb_write(OV_ID|0X01);	//发送读命令	  
+	sccb_start();//wait_ack();
+	sccb_write(OV_ID|0X01);
+	wait_ack();//发送读命令	  
 	delay_us(100);
   	val=sccb_read();		 	//读取数据
   	sccb_nack();
   	sccb_stop();
-  	return val;	
+  	return val;
 }
 
 
@@ -103,6 +104,8 @@ void SCCB_ReadBuf(u8*pBuff, u16 length, u8 ReadAddress)
 
 u8 ov7725_init(void)
 {
+	u8 raw,temp;
+	u16 sx=0,sy=0;
 	u16 i=0;
 	u16 reg=0;
 	GPIO_InitTypeDef GPIO_InitTypeStruct;
@@ -204,6 +207,36 @@ u8 ov7725_init(void)
 	{								
 	   	SCCB_WriteByte(ov7725_init_reg_tb1[i][0],ov7725_init_reg_tb1[i][1]);
  	} 
+
+	SCCB_WriteByte(COM7,0x46);		//设置为QVGA模式
+	SCCB_WriteByte(HSTART,0x3f); 	//水平起始位置
+	SCCB_WriteByte(HSIZE, 0x50); 	//水平尺寸
+	SCCB_WriteByte(VSTRT, 0x03); 	//垂直起始位置
+	SCCB_WriteByte(VSIZE, 0x78); 	//垂直尺寸
+	SCCB_WriteByte(HREF,  0x00);
+	SCCB_WriteByte(HOutSize,0x50);	//输出尺寸
+	SCCB_WriteByte(VOutSize,0x78); //输出尺寸
+	
+	raw=SCCB_ReadByte(HSTART);
+	temp=raw+(sx>>2);//sx高8位存在HSTART,低2位存在HREF[5:4]
+	SCCB_WriteByte(HSTART,temp);
+	SCCB_WriteByte(HSIZE,320>>2);//width高8位存在HSIZE,低2位存在HREF[1:0]
+	
+	raw=SCCB_ReadByte(VSTRT);
+	temp=raw+(sy>>1);//sy高8位存在VSTRT,低1位存在HREF[6]
+	SCCB_WriteByte(VSTRT,temp);
+	SCCB_WriteByte(VSIZE,240>>1);//height高8位存在VSIZE,低1位存在HREF[2]
+	
+	raw=SCCB_ReadByte(HREF);
+	temp=((sy&0x01)<<6)|((sx&0x03)<<4)|((240&0x01)<<2)|(240&0x03)|raw;
+	SCCB_WriteByte(HREF,temp);
+	
+	SCCB_WriteByte(HOutSize,320>>2);
+	SCCB_WriteByte(VOutSize,240>>1);
+	
+	SCCB_ReadByte(EXHCH);	
+	temp = (raw|(320&0x03)|((240&0x01)<<2));	
+	SCCB_WriteByte(EXHCH,temp);
   	return 0; 	//ok
 }
 
